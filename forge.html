@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PROMPT_FORGE.exe</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <script src="assets/js/forge.js" defer></script>
+  </head>
+  <body>
+    <a class="back-link" href="index.html">← Back to Main Page</a>
+
+    <header class="site-header">
+      <h1>PROMPT_FORGE.exe</h1>
+      <div class="subtitle">Build your query. Specificity kills garbage.</div>
+    </header>
+
+    <main class="forge-main">
+      <div class="forge-grid">
+        <div class="form-card">
+          <div class="form-group">
+            <label for="persona">PERSONA</label>
+            <textarea id="persona" rows="2">an Experienced Prompt Engineer</textarea>
+          </div>
+          <div class="form-group">
+            <label for="context">CONTEXT (Draft/Background)</label>
+            <textarea id="context" rows="3">I want to create an app with AI that helps people create better prompts</textarea>
+          </div>
+          <div class="form-group">
+            <label for="task">TASK (Be Specific)</label>
+            <textarea id="task" rows="3">Make a prompt that will direct the LLM to produce the website, using a hacker green color and dark themed interface</textarea>
+          </div>
+          <div class="form-group">
+            <label for="format">OUTPUT FORMAT</label>
+            <textarea id="format" rows="2">The code for the website, how to organize the folder structure if any, and an explanation of any features added or decisions made</textarea>
+          </div>
+          <div class="form-group">
+            <label for="examples">EXAMPLES / CONSTRAINTS</label>
+            <textarea id="examples" rows="3">Don't use the generic colors that you always use. Avoid round corners and gray-blue UI elements.</textarea>
+          </div>
+        </div>
+
+        <div class="preview-window">
+          <div class="preview-header">
+            <div class="dots">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+            </div>
+            <span>generated_output.txt</span>
+          </div>
+          <div class="preview-body" id="previewContent"></div>
+          <div class="copy-bar">
+            <button class="copy-button" id="copyButton">COPY PROMPT</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      Vibe Coded with help from OpenCode<br />
+      No Lived Experience // Verify against trusted sources
+    </footer>
+  </body>
+</html>
