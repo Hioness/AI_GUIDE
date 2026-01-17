@@ -1,7 +1,6 @@
 # AI_GUIDE_v1.1
 
-A multi-page static site teaching Open University students how to use AI tools
-ethically and effectively in philosophy and spiritual studies.
+A quick workflow for using AI without outsourcing your brain.
 
 ## Folder Structure
 
@@ -34,14 +33,14 @@ The site uses CSS custom properties (design tokens) in `assets/css/styles.css`:
 
 ### Homepage (index.html)
 Content order:
-1. Site title and system status subtitle
-2. Purpose statement section
-3. 1.0 SYSTEM ETHICS (4-card grid)
-4. 2.0 THE AI CYCLE LOOP (4 visual cards numbered 01-04)
-5. 3.0 ADVANCED PROTOCOLS (CoT and Adversarial Playoff)
-6. OU ASSESSMENT RULES section
-7. PROMPT HEURISTIC PROTOCOL table
-8. Reflection section
+1. Site title and plain-English subtitle
+2. Purpose statement with AI plausibility clarification
+3. 1.0 SYSTEM ETHICS (4-card grid with "Rule:" and "Example:" format)
+4. 2.0 THE AI CYCLE LOOP (4 operational cards with goal/decision framing and examples)
+5. 3.0 ADVANCED PROTOCOLS (Visible Checkpoints and Adversarial Playoff with explicit output)
+6. AI USE CATEGORIES section with concrete examples
+7. PROMPT HEURISTIC PROTOCOL table (PROMPTS + "Questions to Ask" column)
+8. Reflection section with mandatory question
 9. Footer
 10. "Prompt Forge" link (fixed top-right)
 
