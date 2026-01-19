@@ -11,8 +11,9 @@ AI_GUIDE_v1.1/
 ├── assets/
 │   ├── css/
 │   │   └── styles.css      # Shared styles (tokens + layout + components)
-│   └── js/
-│       └── forge.js        # Prompt Forge interactive functionality
+│   ├── js/
+│   │   └── forge.js        # Prompt Forge interactive functionality
+│   └── favicon.svg         # Cyberpunk favicon
 └── README.md               # This file
 ```
 
@@ -51,6 +52,8 @@ Interactive two-column tool:
 - Preview box: min-height 80px, max-height 60vh, overflow-y auto
 - Real-time updates: preview updates as user types
 - Copy button: visual feedback for 2 seconds after copying
+- Reset flow: inline confirmation before clearing inputs
+- Persistence: prompt fields stored in localStorage
 
 ### Prompt Generation Template
 ```javascript
@@ -133,7 +136,8 @@ Examples/Constraints: ${examples}`;
 2. Click "Prompt Forge" (top-right) to access the prompt builder
 3. Fill in textarea inputs to generate prompts
 4. Click "COPY PROMPT" to copy to clipboard
-5. Click "← Back to Main Page" (top-left) to return to guide
+5. Click "RESET" to clear fields (confirmation required)
+6. Click "← Back to Main Page" (top-left) to return to guide
 
 ## Local Preview
 
