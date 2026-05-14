@@ -3,190 +3,667 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI_GUIDE_v1.1 - Main</title>
-    <link rel="stylesheet" href="assets/css/styles.css" />
-    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <title>PROMPT_FORGE.exe</title>
+    <style>
+      /* --- BASE STYLES (from assets/css/styles.css) --- */
+      @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Share+Tech+Mono&display=swap');
+
+      :root {
+        --background: oklch(0 0 0);
+        --foreground: oklch(0.8348 0.1302 160.9080);
+        --primary: oklch(0.8348 0.1302 160.9080);
+        --primary-foreground: oklch(0.1822 0 0);
+        --secondary: oklch(0.2046 0 0);
+        --accent: oklch(0.3132 0 0);
+        --muted: oklch(0.2393 0 0);
+        --muted-foreground: oklch(0.5 0.05 160);
+        --border: oklch(0.3 0.08 160);
+        --input: oklch(0.2046 0 0);
+        --card: oklch(0.15 0 0);
+        --font-mono: 'JetBrains Mono', 'Share Tech Mono', monospace;
+        --radius: 0rem;
+        --tracking-normal: 0.025em;
+        --tracking-wide: 0.05em;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        background: var(--background);
+        color: var(--foreground);
+        font-family: var(--font-mono);
+        min-height: 100vh;
+        position: relative;
+        letter-spacing: var(--tracking-normal);
+        overflow-x: hidden;
+      }
+
+      /* Scanline overlay */
+      body::after {
+        content: '';
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none;
+        background: linear-gradient(transparent 50%, rgba(34, 197, 94, 0.08) 50%);
+        background-size: 100% 4px;
+        opacity: 0.08;
+        mix-blend-mode: screen;
+        z-index: 100;
+      }
+
+      header.site-header {
+        text-align: center;
+        padding: 2rem 1rem 1rem;
+      }
+
+      header h1 {
+        margin: 0 0 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: var(--tracking-wide);
+      }
+
+      header .subtitle {
+        color: var(--muted-foreground);
+        font-size: 0.95rem;
+      }
+
+      main.forge-main {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1.25rem 4rem;
+      }
+
+      .forge-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .form-card {
+        border: 1px solid var(--border);
+        background: var(--card);
+        padding: 1.25rem;
+        box-shadow: 0 0 18px rgba(34, 197, 94, 0.2);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .form-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 22px rgba(34, 197, 94, 0.35);
+      }
+
+      .form-group { margin-bottom: 1.5rem; }
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      textarea {
+        width: 100%;
+        background: var(--input);
+        color: var(--foreground);
+        border: 1px solid var(--border);
+        padding: 0.75rem;
+        resize: vertical;
+        font-family: var(--font-mono);
+        font-size: 0.95rem;
+        outline: none;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      }
+      textarea:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 12px rgba(34, 197, 94, 0.25);
+      }
+
+      .preview-window {
+        border: 1px solid var(--border);
+        background: #050505;
+        box-shadow: 0 0 22px rgba(34, 197, 94, 0.25);
+        display: flex;
+        flex-direction: column;
+        min-height: 100%;
+        transition: transform 0.2s ease;
+      }
+      .preview-window:hover { transform: translateY(-2px); }
+
+      .preview-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--border);
+        background: rgba(34, 197, 94, 0.1);
+      }
+
+      .dots { display: flex; gap: 0.35rem; }
+      .dot { width: 10px; height: 10px; border-radius: 50%; }
+      .dot.red { background: #ff4d6d; }
+      .dot.yellow { background: #facc15; }
+      .dot.green { background: #22c55e; }
+
+      .preview-body {
+        padding: 1rem;
+        white-space: pre-wrap;
+        flex: 1;
+        min-height: 200px;
+        max-height: 60vh;
+        overflow-y: auto;
+      }
+
+      .copy-bar {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        border-top: 1px solid var(--border);
+        background: rgba(34, 197, 94, 0.05);
+      }
+
+      button {
+        background: var(--primary);
+        color: var(--primary-foreground);
+        border: 1px solid var(--border);
+        padding: 0.6rem 1rem;
+        cursor: pointer;
+        text-transform: uppercase;
+        font-weight: 800;
+        font-family: var(--font-mono);
+        transition: all 0.15s ease;
+      }
+      button:hover { box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); }
+      button.reset-button { background: transparent; color: var(--foreground); }
+      button.reset-button:hover { border-color: #ff4d6d; color: #ff4d6d; box-shadow: 0 0 12px rgba(255, 77, 109, 0.3); }
+
+      .reset-confirm { display: none; align-items: center; gap: 0.5rem; }
+      .confirm-yes { color: #ff4d6d; border-color: #ff4d6d; background: transparent; padding: 0.4rem 0.7rem; font-size: 0.8rem; }
+
+      footer {
+        text-align: center;
+        padding: 2rem 1rem;
+        color: var(--muted-foreground);
+        border-top: 1px solid var(--border);
+        font-size: 0.85rem;
+      }
+
+      /* --- DRAWER & TRIGGER STYLES (NEW) --- */
+      .guide-trigger {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        width: 50px;
+        height: 50px;
+        border-radius: 0;
+        background: var(--card);
+        border: 1px solid var(--primary);
+        color: var(--primary);
+        font-size: 1.5rem;
+        z-index: 44;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 15px rgba(34, 197, 94, 0.3);
+      }
+      .guide-trigger:hover {
+        background: var(--primary);
+        color: var(--primary-foreground);
+        transform: scale(1.05);
+      }
+
+      .guide-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.8);
+        z-index: 40;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+        backdrop-filter: blur(2px);
+      }
+      .guide-backdrop.active { opacity: 1; pointer-events: auto; }
+
+      .guide-drawer {
+        position: fixed;
+        top: 0; right: 0; bottom: 0;
+        width: 450px;
+        max-width: 100vw;
+        background: #050505;
+        border-left: 1px solid var(--border);
+        z-index: 45;
+        transform: translateX(100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+      }
+      .guide-drawer.active { transform: translateX(0); }
+
+      .guide-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(34, 197, 94, 0.05);
+      }
+      .guide-header h2 { margin: 0; color: var(--primary); font-size: 1.2rem; }
+      .guide-close { background: transparent; border: none; color: var(--muted-foreground); font-size: 1.5rem; padding: 0.5rem; }
+      .guide-close:hover { color: #ff4d6d; }
+
+      .guide-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1rem;
+        scrollbar-width: thin;
+        scrollbar-color: var(--border) transparent;
+      }
+
+      /* Collapsible sections in drawer */
+      details {
+        border: 1px solid var(--border);
+        margin-bottom: 0.75rem;
+        background: rgba(34, 197, 94, 0.02);
+      }
+      summary {
+        padding: 1rem;
+        cursor: pointer;
+        font-weight: 700;
+        color: var(--primary);
+        text-transform: uppercase;
+        list-style: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      summary::after { content: '+'; font-size: 1.2rem; }
+      details[open] summary::after { content: '−'; }
+      summary:hover { background: rgba(34, 197, 94, 0.08); }
+
+      .guide-section-content {
+        padding: 0 1rem 1rem;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        color: var(--muted-foreground);
+      }
+      .guide-section-content h3 { color: var(--foreground); margin-top: 1rem; font-size: 1rem; }
+      .guide-section-content p { margin-bottom: 0.75rem; }
+      .warning-box {
+        border: 1px solid #ff0050;
+        padding: 0.75rem;
+        background: rgba(255,0,80,0.05);
+        color: #ff8fb1;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        margin: 1rem 0;
+      }
+
+      .protocol-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.8rem;
+        margin-top: 0.5rem;
+      }
+      .protocol-table th, .protocol-table td {
+        border: 1px solid var(--border);
+        padding: 0.5rem;
+        text-align: left;
+      }
+      .protocol-table th { background: rgba(34,197,94,0.1); }
+
+      /* --- GUIDE FOOTER (always visible at drawer bottom) --- */
+      .guide-footer {
+        padding: 1.25rem 1rem;
+        border-top: 1px solid var(--border);
+        text-align: center;
+        background: var(--card);
+        flex-shrink: 0;
+      }
+      .guide-footer-label {
+        color: var(--muted-foreground);
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 0.5rem;
+      }
+      .guide-full-link {
+        display: inline-block;
+        padding: 0.6rem 1.25rem;
+        border: 1px solid var(--primary);
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        transition: all 0.15s ease;
+      }
+      .guide-full-link:hover {
+        background: var(--primary);
+        color: var(--primary-foreground);
+        box-shadow: 0 0 18px rgba(34, 197, 94, 0.35);
+      }
+
+      /* Responsive tweaks */
+      @media (max-width: 768px) {
+        .guide-drawer { width: 100vw; }
+        .guide-trigger { bottom: 1rem; right: 1rem; }
+      }
+    </style>
   </head>
   <body>
-    <a class="forge-link" href="forge.html">Prompt Forge</a>
 
+    <!-- GUIDE TRIGGER -->
+    <button class="guide-trigger" id="guideTrigger" title="Open Reference Guide">?</button>
+
+    <!-- BACKDROP -->
+    <div class="guide-backdrop" id="guideBackdrop"></div>
+
+    <!-- GUIDE DRAWER -->
+    <aside class="guide-drawer" id="guideDrawer">
+      <div class="guide-header">
+        <h2>REFERENCE MANUAL</h2>
+        <button class="guide-close" id="guideClose">✕</button>
+      </div>
+      <div class="guide-body">
+        
+        <details name="guide-accordion" open>
+          <summary>PURPOSE</summary>
+          <div class="guide-section-content">
+            <p>AI generates salience, not truth. It is a "confident autocomplete" that provides what sounds right, not necessarily what is true.</p>
+            <div class="warning-box">
+              NORTH STAR: AI dependence erodes depth of understanding. Use it to amplify inquiry, not bypass it.
+            </div>
+          </div>
+        </details>
+
+        <details name="guide-accordion">
+          <summary>1.0 SYSTEM ETHICS</summary>
+          <div class="guide-section-content">
+            <h3>Privacy</h3>
+            <p>Never share personal data or sensitive information.</p>
+            <h3>Copyright</h3>
+            <p>Don't input protected content you don't own.</p>
+            <h3>Labor & Environment</h3>
+            <p>Use prompts efficiently to reduce resource use.</p>
+            <h3>Bias</h3>
+            <p>Assume outputs reflect training biases and verify.</p>
+          </div>
+        </details>
+
+        <details name="guide-accordion">
+          <summary>2.0 THE AI CYCLE LOOP</summary>
+          <div class="guide-section-content">
+            <p><strong>01 PREPARE:</strong> Goal: Decision, learning, or production.</p>
+            <p><strong>02 PROMPT:</strong> Formula: Persona + Context + Constraints.</p>
+            <p><strong>03 VERIFY:</strong> Test claims, don't trust tone.</p>
+            <p><strong>04 REFLECT:</strong> Risks: Bias, hallucination, over-reliance.</p>
+          </div>
+        </details>
+
+        <details name="guide-accordion">
+          <summary>3.0 ADVANCED PROTOCOLS</summary>
+          <div class="guide-section-content">
+            <h3>Protocol 1: Visible Checkpoints</h3>
+            <p>Request: List assumptions, show calculations, identify failure modes.</p>
+            <h3>Protocol 2: Adversarial Playoff</h3>
+            <p>Persona 1 (Optimist) vs Persona 2 (Skeptic). Persona 3 (Judge) summarizes.</p>
+          </div>
+        </details>
+
+        <details name="guide-accordion">
+          <summary>AI USE CATEGORIES</summary>
+          <div class="guide-section-content">
+            <p><strong style="color:#ff4d6d">[CAT 1]</strong> No AI allowed (Exams, confidential records).</p>
+            <p><strong style="color:#ffd166">[CAT 2]</strong> Allowed with acknowledgment (Research, brainstorming).</p>
+            <p><strong style="color:#7bd88f">[CAT 3]</strong> Required—verify critically (Translation, summaries).</p>
+          </div>
+        </details>
+
+        <details name="guide-accordion">
+          <summary>PROMST HEURISTIC</summary>
+          <div class="guide-section-content">
+            <table class="protocol-table">
+              <thead>
+                <tr><th>Ref</th><th>Criterion</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>P</td><td>Presentation</td></tr>
+                <tr><td>R</td><td>Relevance</td></tr>
+                <tr><td>O</td><td>Objectivity</td></tr>
+                <tr><td>M</td><td>Method</td></tr>
+                <tr><td>S</td><td>Sources</td></tr>
+                <tr><td>T</td><td>Timeliness</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <details name="guide-accordion">
+          <summary>REFLECTION</summary>
+          <div class="guide-section-content">
+            <p><strong>Mandatory:</strong> What decision or skill am I working on?</p>
+            <p>1. What do I lose by outsourcing this?</p>
+            <p>2. What would falsify the AI's claim?</p>
+            <p>3. What's the smallest next action without AI?</p>
+          </div>
+        </details>
+
+      </div>
+
+      <div class="guide-footer">
+        <div class="guide-footer-label">WANT THE COMPLETE REFERENCE?</div>
+        <a href="guide.html" class="guide-full-link">→ VIEW FULL GUIDE</a>
+      </div>
+    </aside>
+
+    <!-- MAIN FORGE INTERFACE -->
     <header class="site-header">
-      <h1>AI_GUIDE_v1.1</h1>
-      <div class="subtitle">A quick workflow for using AI without outsourcing your brain.</div>
+      <h1>PROMPT_FORGE.exe</h1>
+      <div class="subtitle">Build your query. Specificity kills garbage.</div>
     </header>
 
-    <main>
-      <section class="section-block purpose">
-        <h2>:: PURPOSE (User: Learner) ::</h2>
-        <p>
-          AI generates salience, not truth. It is a "confident autocomplete" that provides what sounds right, not necessarily what is true. We offer the methods to navigate this gap, helping you use AI as a tool for deeper understanding rather than a shortcut to an unexamined life.
-        </p>
-        <div class="warning-box">
-          NORTH STAR: AI dependence erodes depth of understanding. Use it to amplify inquiry, not bypass it.
-        </div>
-      </section>
-
-      <section class="section-block ethics">
-        <h2>1.0 SYSTEM ETHICS</h2>
-        <div class="grid-four">
-          <div class="card">
-            <h3>Privacy</h3>
-            <p><strong>Rule:</strong> Never share personal data or sensitive information.</p>
-            <p><strong>Example:</strong> Don't input medical records, financial details, or government documents.</p>
+    <main class="forge-main">
+      <div class="forge-grid">
+        <div class="form-card">
+          <div class="form-group">
+            <label for="persona">PERSONA</label>
+            <textarea id="persona" rows="2">an Experienced Prompt Engineer</textarea>
           </div>
-          <div class="card">
-            <h3>Copyright</h3>
-            <p><strong>Rule:</strong> Don't input protected content you don't own.</p>
-            <p><strong>Example:</strong> Avoid pasting full articles, books, or proprietary code.</p>
+          <div class="form-group">
+            <label for="context">CONTEXT (Draft/Background)</label>
+            <textarea id="context" rows="3">I want to create an app with AI that helps people create better prompts</textarea>
           </div>
-          <div class="card">
-            <h3>Labor & Environment</h3>
-            <p><strong>Rule:</strong> Use prompts efficiently to reduce resource use.</p>
-            <p><strong>Example:</strong> Combine related questions into one well-structured prompt.</p>
+          <div class="form-group">
+            <label for="task">TASK (Be Specific)</label>
+            <textarea id="task" rows="3">Make a prompt that will direct the LLM to produce the website, using a hacker green color and dark themed interface</textarea>
           </div>
-          <div class="card">
-            <h3>Bias</h3>
-            <p><strong>Rule:</strong> Assume outputs reflect training biases and verify.</p>
-            <p><strong>Example:</strong> If a claim feels one-sided, check other perspectives.</p>
+          <div class="form-group">
+            <label for="format">OUTPUT FORMAT</label>
+            <textarea id="format" rows="2">The code for the website, how to organize the folder structure if any, and an explanation of any features added or decisions made</textarea>
+          </div>
+          <div class="form-group">
+            <label for="examples">EXAMPLES / CONSTRAINTS</label>
+            <textarea id="examples" rows="3">Don't use the generic colors that you always use. Avoid round corners and gray-blue UI elements.</textarea>
           </div>
         </div>
-      </section>
 
-      <section class="section-block loop">
-        <h2>2.0 THE AI CYCLE LOOP</h2>
-        <div class="loop-grid">
-          <div class="loop-card">
-            <div class="number">Card 01 - PREPARE</div>
-            <div class="tag">[Clarity]</div>
-            <p><strong>Goal:</strong> Decision, learning, or production.</p>
-            <p><strong>Self-check:</strong> Am I replacing learning I should do myself?</p>
+        <div class="preview-window">
+          <div class="preview-header">
+            <div class="dots">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+            </div>
+            <span>generated_output.txt</span>
           </div>
-          <div class="loop-card">
-            <div class="number">Card 02 - PROMPT</div>
-            <div class="tag">[Direct]</div>
-            <p><strong>Formula:</strong> Persona + Context + Constraints.</p>
-            <p><strong>Example:</strong> "Act as a writing coach. Help me outline an essay about AI ethics for a college audience. Keep it under 500 words."</p>
-          </div>
-          <div class="loop-card">
-            <div class="number">Card 03 - VERIFY</div>
-            <div class="tag">[Check]</div>
-            <p><strong>Test claims, don't trust tone.</strong></p>
-            <p>Cross-check key facts with primary sources.</p>
-          </div>
-          <div class="loop-card">
-            <div class="number">Card 04 - REFLECT</div>
-            <div class="tag">[Reflection]</div>
-            <p><strong>Risks:</strong> Bias, hallucination, over-reliance.</p>
-            <p><strong>Skill practiced:</strong> Critical evaluation, research.</p>
+          <div class="preview-body" id="previewContent"></div>
+          <div class="copy-bar">
+            <button class="copy-button" id="copyButton">COPY PROMPT</button>
+            <button class="reset-button" id="resetButton">RESET</button>
+            <div class="reset-confirm" id="resetConfirm">
+              <span>Clear all?</span>
+              <button class="confirm-yes" id="confirmYes">Yes</button>
+              <button class="confirm-cancel" id="confirmCancel">Cancel</button>
+            </div>
           </div>
         </div>
-      </section>
-
-      <section class="section-block protocols">
-        <h2>3.0 ADVANCED PROTOCOLS</h2>
-        <div class="protocols-grid">
-          <div class="protocol-card purple">
-            <h3>Protocol 1: Visible Checkpoints</h3>
-            <p>Boosts accuracy by making reasoning explicit. Request:</p>
-            <p>
-              - List your assumptions.<br />
-              - Show any quick calculations.<br />
-              - Identify 3 failure modes.<br />
-              - State confidence level and what evidence would change your answer.
-            </p>
-          </div>
-          <div class="protocol-card cyan">
-            <h3>Protocol 2: Adversarial Playoff</h3>
-            <p>Use for structured debate:</p>
-            <p>
-              Persona 1 (Optimist): Argue for the proposal.<br />
-              Persona 2 (Skeptic): Argue against it.<br />
-              Persona 3 (Judge): Debate, then summarize valid points.<br /><br />
-              <strong>Required output:</strong> Decision, strongest pro, strongest con, and what evidence would settle it.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section class="section-block assessment-rules">
-        <h2>:: AI USE CATEGORIES (NON-NEGOTIABLE) ::</h2>
-        <ul>
-          <li><span class="cat-1">[CAT 1]</span> No AI allowed.</li>
-          <p>Examples: Exams and graded work, impersonation, confidential records.</p>
-          <li><span class="cat-2">[CAT 2]</span> Allowed with acknowledgment.</li>
-          <p>Examples: Research summaries with citations, brainstorming, drafting, outlines.</p>
-          <li><span class="cat-3">[CAT 3]</span> Required—verify critically.</li>
-          <p>Examples: Translation/accessibility tools, transcription, first-pass summaries.</p>
-        </ul>
-      </section>
-
-      <section class="section-block prompt-framework">
-        <h2>PROMPT HEURISTIC PROTOCOL</h2>
-        <p>Mandatory verification layer for all AI outputs.</p>
-        <div class="glossary-note">
-          PROMST = Presentation, Relevance, Objectivity, Method, Sources, Timeliness.
-        </div>
-        <div class="table-wrapper">
-          <table class="protocol-table">
-            <thead>
-              <tr>
-                <th>Ref</th>
-                <th>Criterion</th>
-                <th>Questions to Ask</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>P</td>
-                <td>Presentation</td>
-                <td>Is the content strong, or just polished prose?</td>
-              </tr>
-              <tr>
-                <td>R</td>
-                <td>Relevance</td>
-                <td>Does this match my actual question and scope?</td>
-              </tr>
-              <tr>
-                <td>O</td>
-                <td>Objectivity</td>
-                <td>Are multiple perspectives represented, including marginalized voices?</td>
-              </tr>
-              <tr>
-                <td>M</td>
-                <td>Method</td>
-                <td>Is the reasoning process transparent and checkable?</td>
-              </tr>
-              <tr>
-                <td>S</td>
-                <td>Sources</td>
-                <td>Can I verify claims with primary sources, or are citations fabricated?</td>
-              </tr>
-              <tr>
-                <td>T</td>
-                <td>Timeliness</td>
-                <td>Is this information current for my context?</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="section-block reflection">
-        <h3>REFLECTION: The Final Gate</h3>
-        <p><strong>Mandatory question:</strong> What decision or skill am I working on?</p>
-        <p><strong>Optional checks:</strong></p>
-        <ol>
-          <li>What do I lose by outsourcing this?</li>
-          <li>What would falsify the AI's claim?</li>
-          <li>What's the smallest next action without AI?</li>
-        </ol>
-        <div class="bottom-line">AI is a Mirror, Not a Sage.</div>
-      </section>
+      </div>
     </main>
 
     <footer>
       Vibe Coded with help from OpenCode<br />
       AI can be wrong. Verify with primary sources.
     </footer>
+
+    <script>
+      /* --- FORGE LOGIC (from assets/js/forge.js) --- */
+      document.addEventListener('DOMContentLoaded', () => {
+        const personaInput = document.getElementById('persona');
+        const contextInput = document.getElementById('context');
+        const taskInput = document.getElementById('task');
+        const formatInput = document.getElementById('format');
+        const examplesInput = document.getElementById('examples');
+        const previewContent = document.getElementById('previewContent');
+        const copyButton = document.getElementById('copyButton');
+        const resetButton = document.getElementById('resetButton');
+        const resetConfirm = document.getElementById('resetConfirm');
+        const confirmYes = document.getElementById('confirmYes');
+        const confirmCancel = document.getElementById('confirmCancel');
+
+        const storageKeys = {
+          persona: 'forge-persona',
+          context: 'forge-context',
+          task: 'forge-task',
+          format: 'forge-format',
+          examples: 'forge-examples'
+        };
+
+        const defaultValues = {
+          persona: 'an Experienced Prompt Engineer',
+          context: 'I want to create an app with AI that helps people create better prompts',
+          task: 'Make a prompt that will direct the LLM to produce the website, using a hacker green color and dark themed interface',
+          format: 'The code for the website, how to organize the folder structure if any, and an explanation of any features added or decisions made',
+          examples: "Don't use the generic colors that you always use. Avoid round corners and gray-blue UI elements."
+        };
+
+        const resizeTextarea = (element) => {
+          element.style.height = 'auto';
+          element.style.height = `${element.scrollHeight}px`;
+        };
+
+        const saveToStorage = () => {
+          localStorage.setItem(storageKeys.persona, personaInput.value);
+          localStorage.setItem(storageKeys.context, contextInput.value);
+          localStorage.setItem(storageKeys.task, taskInput.value);
+          localStorage.setItem(storageKeys.format, formatInput.value);
+          localStorage.setItem(storageKeys.examples, examplesInput.value);
+        };
+
+        const loadFromStorage = () => {
+          const savedPersona = localStorage.getItem(storageKeys.persona);
+          const savedContext = localStorage.getItem(storageKeys.context);
+          const savedTask = localStorage.getItem(storageKeys.task);
+          const savedFormat = localStorage.getItem(storageKeys.format);
+          const savedExamples = localStorage.getItem(storageKeys.examples);
+
+          if (savedPersona !== null) personaInput.value = savedPersona;
+          if (savedContext !== null) contextInput.value = savedContext;
+          if (savedTask !== null) taskInput.value = savedTask;
+          if (savedFormat !== null) formatInput.value = savedFormat;
+          if (savedExamples !== null) examplesInput.value = savedExamples;
+        };
+
+        const updatePreview = () => {
+          const persona = personaInput.value.trim();
+          const context = contextInput.value.trim();
+          const task = taskInput.value.trim();
+          const format = formatInput.value.trim();
+          const examples = examplesInput.value.trim();
+
+          let parts = [];
+          if (persona) parts.push(`You are ${persona}.`);
+          if (context) parts.push(`Context: ${context}`);
+          parts.push(`Task: ${task}`);
+          if (format) parts.push(`Output: ${format}`);
+          parts.push(`If unclear/unknown: Say "I don't know" exactly.`);
+          if (examples) parts.push(`Examples/Constraints: ${examples}`);
+
+          previewContent.textContent = parts.join('\n\n');
+        };
+
+        const copyPrompt = async () => {
+          const textToCopy = previewContent.textContent;
+          const originalText = copyButton.textContent;
+          try {
+            await navigator.clipboard.writeText(textToCopy);
+            copyButton.textContent = '✔ COPIED';
+          } catch (err) {
+            copyButton.textContent = 'FAILED';
+          }
+          setTimeout(() => { copyButton.textContent = originalText; }, 2000);
+        };
+
+        const resetAllInputs = () => {
+          personaInput.value = defaultValues.persona;
+          contextInput.value = defaultValues.context;
+          taskInput.value = defaultValues.task;
+          formatInput.value = defaultValues.format;
+          examplesInput.value = defaultValues.examples;
+          [personaInput, contextInput, taskInput, formatInput, examplesInput].forEach(el => resizeTextarea(el));
+          saveToStorage();
+          updatePreview();
+          resetConfirm.style.display = 'none';
+          resetButton.style.display = 'block';
+        };
+
+        const inputs = [personaInput, contextInput, taskInput, formatInput, examplesInput];
+        loadFromStorage();
+        inputs.forEach((el) => {
+          resizeTextarea(el);
+          el.addEventListener('input', (e) => {
+            resizeTextarea(e.target);
+            saveToStorage();
+            updatePreview();
+          });
+        });
+
+        copyButton.addEventListener('click', copyPrompt);
+        resetButton.addEventListener('click', () => {
+          resetButton.style.display = 'none';
+          resetConfirm.style.display = 'flex';
+        });
+        confirmYes.addEventListener('click', resetAllInputs);
+        confirmCancel.addEventListener('click', () => {
+          resetConfirm.style.display = 'none';
+          resetButton.style.display = 'block';
+        });
+
+        updatePreview();
+
+        /* --- DRAWER LOGIC --- */
+        const trigger = document.getElementById('guideTrigger');
+        const backdrop = document.getElementById('guideBackdrop');
+        const drawer = document.getElementById('guideDrawer');
+        const closeBtn = document.getElementById('guideClose');
+
+        const openDrawer = () => {
+          drawer.classList.add('active');
+          backdrop.classList.add('active');
+        };
+
+        const closeDrawer = () => {
+          drawer.classList.remove('active');
+          backdrop.classList.remove('active');
+        };
+
+        trigger.addEventListener('click', openDrawer);
+        closeBtn.addEventListener('click', closeDrawer);
+        backdrop.addEventListener('click', closeDrawer);
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') closeDrawer();
+        });
+      });
+    </script>
   </body>
 </html>

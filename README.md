@@ -1,59 +1,54 @@
-# AI_GUIDE_v1.1
+# AI_GUIDE v2.0
 
 A quick workflow for using AI without outsourcing your brain.
 
 ## Folder Structure
 
 ```
-AI_GUIDE_v1.1/
-├── index.html              # Homepage with guide and verification framework
-├── forge.html              # Prompt Forge interactive tool
+AI_GUIDE/
+├── index.html              # Main page: Prompt Forge + collapsible reference drawer
+├── guide.html              # Full standalone reference manual
+├── forge.html              # Redirect to index.html (legacy bookmark support)
 ├── assets/
 │   ├── css/
-│   │   └── styles.css      # Shared styles (tokens + layout + components)
+│   │   └── styles.css      # Shared styles (used by guide.html)
 │   ├── js/
-│   │   └── forge.js        # Prompt Forge interactive functionality
+│   │   └── forge.js        # Legacy forge JS (new index.html uses inline JS)
 │   └── favicon.svg         # Cyberpunk favicon
 └── README.md               # This file
 ```
 
 ## Architecture
 
-### Multi-Page Navigation
-- Homepage (`index.html`): "Prompt Forge" link fixed to top-right corner
-- Forge Page (`forge.html`): "← Back to Main Page" button fixed to top-left corner
-- No persistent navigation bar across pages
+### Single-Page Focus
+The Prompt Forge is the default landing (`index.html`). The educational reference material lives in two places:
 
-### Token System Integration
-The site uses CSS custom properties (design tokens) in `assets/css/styles.css`:
-- Base tokens are defined first, then cyberpunk overrides follow
-- Components reference tokens like `var(--primary)`, `var(--background)`, etc.
-- The theme can be adjusted by editing the override values
+1. **Collapsible drawer** (`index.html`) — triggered by a "?" button fixed at the bottom-right corner. Includes all reference sections in a native `<details name>` accordion (only one panel open at a time). A "→ VIEW FULL GUIDE" link in the drawer footer opens the standalone page.
+2. **Standalone page** (`guide.html`) — full-page reference manual linked from the drawer footer, for deep reading.
+
+### Navigation Flow
+```
+index.html (forge + drawer)  ←→  guide.html (full reference)
+        ↑                              ↑
+        └── forge.html (legacy redirect)
+```
 
 ## Implementation Details
 
-### Homepage (index.html)
-Content order:
-1. Site title and plain-English subtitle
-2. Purpose statement with AI plausibility clarification
-3. 1.0 SYSTEM ETHICS (4-card grid with "Rule:" and "Example:" format)
-4. 2.0 THE AI CYCLE LOOP (4 operational cards with goal/decision framing and examples)
-5. 3.0 ADVANCED PROTOCOLS (Visible Checkpoints and Adversarial Playoff with explicit output)
-6. AI USE CATEGORIES section with concrete examples
-7. PROMPT HEURISTIC PROTOCOL table (PROMPTS + "Questions to Ask" column)
-8. Reflection section with mandatory question
-9. Footer
-10. "Prompt Forge" link (fixed top-right)
+### Main Page (index.html)
+- Self-contained single file (inline CSS and JS)
+- Left column: 5 textarea inputs (Persona, Context, Task, Format, Constraints)
+- Right column: live preview in terminal-style window with copy/reset
+- Drawer with native HTML accordion (`<details name="guide-accordion">`)
+- "?" button in the bottom-right corner opens the reference drawer
+- Escape key or backdrop click closes the drawer
+- Scanline overlay renders uniformly across the entire viewport (including drawer)
 
-### Prompt Forge (forge.html)
-Interactive two-column tool:
-- Left column: 5 textarea inputs with labels and default values
-- Right column: live preview in terminal-style window
-- Preview box: min-height 80px, max-height 60vh, overflow-y auto
-- Real-time updates: preview updates as user types
-- Copy button: visual feedback for 2 seconds after copying
-- Reset flow: inline confirmation before clearing inputs
-- Persistence: prompt fields stored in localStorage
+### Reference Page (guide.html)
+- Standalone version of all educational content
+- Self-contained with inline styles (same cyberpunk theme as main page)
+- "← Back to Forge" link fixed to top-left corner
+- Preserves the original full content from v1.1
 
 ### Prompt Generation Template
 ```javascript
@@ -66,6 +61,7 @@ Task: ${task}
 Output: ${format}
 
 If unclear/unknown: Say "I don't know" exactly.
+
 Examples/Constraints: ${examples}`;
 ```
 
@@ -91,15 +87,15 @@ Examples/Constraints: ${examples}`;
 
 ## Responsive Design
 
-- Desktop: full multi-column layouts
-- Tablet (≤1024px): grid cards reduce to smaller columns
-- Mobile (≤768px): single column layouts, adjusted spacing
+- Desktop: full two-column forge layout, drawer slides over from right
+- Mobile (≤768px): single column forge layout, drawer is full-width
+- Drawer trigger ("?" button) adjusts position and size on mobile
 
 ## Technical Stack
 
-- HTML5: semantic markup
-- CSS3: custom properties, CSS Grid, Flexbox
-- Vanilla JavaScript: event listeners, Clipboard API
+- HTML5: semantic markup, native `<details name>` accordion
+- CSS3: custom properties, CSS Grid, Flexbox, transitions
+- Vanilla JavaScript: event listeners, Clipboard API, localStorage
 - Google Fonts: JetBrains Mono, Share Tech Mono
 - No frameworks: pure HTML/CSS/JS
 
@@ -108,36 +104,42 @@ Examples/Constraints: ${examples}`;
 ### Visual Effects
 - Scanline overlay for CRT aesthetic
 - Neon glow borders on hover
-- Terminal-style window with fake OS dots
+- Terminal-style preview window with fake OS dots
+- Slide-in drawer with backdrop blur
 
 ### Interactivity
 - Real-time prompt generation
 - Copy to clipboard with visual feedback
-- Hover effects on cards and buttons
-- Smooth transitions and animations
+- Exclusive accordion (native `<details name>` — zero JS)
+- drawer open/close with backdrop and Escape key
+- localStorage persistence for prompt fields
+- Reset with inline confirmation
 
 ## Accessibility
 
 - Semantic HTML structure
 - Proper heading hierarchy
 - High contrast (bright green on black)
-- Keyboard navigation support
+- Keyboard navigation support (Tab, Enter, Escape)
+- Native `<details>` accordion (ARIA-compatible)
+- `aria-label` on trigger and drawer
 
 ## Performance
 
 - Fast loading (minimal dependencies)
 - CSS-based animations (GPU accelerated)
 - No JavaScript blocking rendering
-- Optimized font loading
+- Optimized font loading via Google Fonts `@import`
 
 ## Usage
 
-1. Open `index.html` in a web browser to view the guide
-2. Click "Prompt Forge" (top-right) to access the prompt builder
-3. Fill in textarea inputs to generate prompts
-4. Click "COPY PROMPT" to copy to clipboard
-5. Click "RESET" to clear fields (confirmation required)
-6. Click "← Back to Main Page" (top-left) to return to guide
+1. Open `index.html` in a web browser to see the Prompt Forge
+2. Fill in textarea inputs to generate a structured prompt
+3. Click "COPY PROMPT" to copy to clipboard
+4. Click "RESET" to clear fields (confirmation required)
+5. Click the "?" button (bottom-right) to open the reference drawer
+6. Click "→ VIEW FULL GUIDE" in the drawer footer for the standalone page
+7. Press Escape or click the backdrop to close the drawer
 
 ## Local Preview
 
@@ -148,6 +150,11 @@ python -m http.server 8000
 ```
 
 Then open:
-
 - `http://localhost:8000/index.html`
-- `http://localhost:8000/forge.html`
+- `http://localhost:8000/guide.html`
+
+## Upgrading from v1.1
+
+- Old bookmarks to `forge.html` now redirect automatically to `index.html`
+- The standalone guide moved from `index.html` → `guide.html`
+- `assets/js/forge.js` is preserved for reference but no longer loaded by any page

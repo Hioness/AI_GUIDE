@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI_GUIDE — Reference Manual</title>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Share+Tech+Mono&display=swap');
+
+      :root {
+        --background: oklch(0 0 0);
+        --foreground: oklch(0.8348 0.1302 160.9080);
+        --primary: oklch(0.8348 0.1302 160.9080);
+        --primary-foreground: oklch(0.1822 0 0);
+        --secondary: oklch(0.2046 0 0);
+        --accent: oklch(0.3132 0 0);
+        --muted: oklch(0.2393 0 0);
+        --muted-foreground: oklch(0.5 0.05 160);
+        --border: oklch(0.3 0.08 160);
+        --input: oklch(0.2046 0 0);
+        --card: oklch(0.15 0 0);
+        --font-mono: 'JetBrains Mono', 'Share Tech Mono', monospace;
+        --radius: 0rem;
+        --tracking-normal: 0.025em;
+        --tracking-wide: 0.05em;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        background: var(--background);
+        color: var(--foreground);
+        font-family: var(--font-mono);
+        min-height: 100vh;
+        position: relative;
+        letter-spacing: var(--tracking-normal);
+      }
+
+      /* Scanline overlay */
+      body::after {
+        content: '';
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none;
+        background: linear-gradient(transparent 50%, rgba(34, 197, 94, 0.08) 50%);
+        background-size: 100% 4px;
+        opacity: 0.08;
+        mix-blend-mode: screen;
+        z-index: 100;
+      }
+
+      main {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 3rem 1.25rem 4rem;
+      }
+
+      header.site-header {
+        text-align: center;
+        padding: 2rem 1rem 1rem;
+      }
+
+      h1, h2, h3 {
+        margin: 0 0 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: var(--tracking-wide);
+      }
+
+      header .subtitle {
+        color: var(--muted-foreground);
+        font-size: 0.95rem;
+      }
+
+      .back-link {
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        padding: 0.65rem 1rem;
+        background: var(--primary);
+        color: var(--primary-foreground);
+        border: 1px solid var(--border);
+        box-shadow: 0 0 18px rgba(34, 197, 94, 0.35);
+        text-transform: uppercase;
+        letter-spacing: var(--tracking-wide);
+        font-weight: 700;
+        z-index: 20;
+        text-decoration: none;
+        transition: box-shadow 0.15s ease, transform 0.15s ease;
+      }
+
+      .back-link:hover {
+        box-shadow: 0 0 26px rgba(34, 197, 94, 0.5);
+        transform: translateY(-1px);
+      }
+
+      .section-block {
+        background: linear-gradient(120deg, rgba(34, 197, 94, 0.08), rgba(0, 0, 0, 0.6));
+        border: 1px solid var(--border);
+        box-shadow: 0 0 18px rgba(34, 197, 94, 0.2);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        transition: box-shadow 0.2s ease, transform 0.2s ease;
+      }
+
+      .section-block:hover {
+        box-shadow: 0 0 22px rgba(34, 197, 94, 0.35);
+        transform: translateY(-2px);
+      }
+
+      .grid-four {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        padding: 1rem;
+        box-shadow: 0 0 12px rgba(34, 197, 94, 0.12);
+        min-height: 120px;
+      }
+
+      .card h3 {
+        color: var(--primary);
+        margin-bottom: 0.25rem;
+      }
+
+      .tag {
+        display: inline-block;
+        padding: 0.15rem 0.45rem;
+        background: var(--accent);
+        color: var(--foreground);
+        font-size: 0.8rem;
+        margin-bottom: 0.35rem;
+      }
+
+      .warning-box {
+        background: linear-gradient(90deg, rgba(255, 0, 76, 0.2), rgba(34, 197, 94, 0.1));
+        border: 1px solid #ff0050;
+        padding: 1rem;
+        margin-top: 0.75rem;
+        color: #ff8fb1;
+        text-transform: uppercase;
+      }
+
+      .loop-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1rem;
+      }
+
+      .loop-card {
+        border: 1px solid var(--border);
+        padding: 1rem;
+        background: linear-gradient(160deg, rgba(34, 197, 94, 0.08), rgba(0, 0, 0, 0.6));
+        box-shadow: 0 0 14px rgba(34, 197, 94, 0.18);
+      }
+
+      .loop-card .number {
+        color: var(--primary);
+        font-weight: 800;
+        margin-bottom: 0.35rem;
+      }
+
+      .protocols-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1rem;
+      }
+
+      .protocol-card {
+        border: 1px solid var(--border);
+        padding: 1rem;
+        background: linear-gradient(120deg, rgba(34, 197, 94, 0.06), rgba(0, 0, 0, 0.6));
+      }
+
+      .protocol-card.purple { border-color: #a855f7; }
+      .protocol-card.cyan { border-color: #22d3ee; }
+
+      .assessment-rules {
+        background: rgba(255, 0, 76, 0.08);
+        border: 1px solid #ff0048;
+        padding: 1.25rem;
+      }
+
+      .cat-1 { color: #ff4d6d; font-weight: 700; }
+      .cat-2 { color: #ffd166; font-weight: 700; }
+      .cat-3 { color: #7bd88f; font-weight: 700; }
+
+      .protocol-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 0.5rem;
+      }
+
+      .protocol-table th, .protocol-table td {
+        border: 1px solid var(--border);
+        padding: 0.65rem;
+        text-align: left;
+      }
+
+      .protocol-table th { background: rgba(34, 197, 94, 0.1); }
+      .protocol-table td:first-child { color: var(--primary); font-weight: 700; }
+
+      footer {
+        text-align: center;
+        padding: 2rem 1rem;
+        color: var(--muted-foreground);
+        border-top: 1px solid var(--border);
+        font-size: 0.85rem;
+      }
+
+      @media (max-width: 768px) {
+        .back-link { position: static; display: block; text-align: center; margin-bottom: 1rem; }
+        main { padding-top: 1rem; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="back-link" href="index.html">← Back to Forge</a>
+
+    <header class="site-header">
+      <h1>AI_GUIDE — Reference Manual</h1>
+      <div class="subtitle">A quick workflow for using AI without outsourcing your brain.</div>
+    </header>
+
+    <main>
+      <section class="section-block purpose">
+        <h2>:: PURPOSE (User: Learner) ::</h2>
+        <p>
+          AI generates salience, not truth. It is a "confident autocomplete" that provides what sounds right, not necessarily what is true. We offer the methods to navigate this gap, helping you use AI as a tool for deeper understanding rather than a shortcut to an unexamined life.
+        </p>
+        <div class="warning-box">
+          NORTH STAR: AI dependence erodes depth of understanding. Use it to amplify inquiry, not bypass it.
+        </div>
+      </section>
+
+      <section class="section-block ethics">
+        <h2>1.0 SYSTEM ETHICS</h2>
+        <div class="grid-four">
+          <div class="card">
+            <h3>Privacy</h3>
+            <p><strong>Rule:</strong> Never share personal data or sensitive information.</p>
+            <p><strong>Example:</strong> Don't input medical records, financial details, or government documents.</p>
+          </div>
+          <div class="card">
+            <h3>Copyright</h3>
+            <p><strong>Rule:</strong> Don't input protected content you don't own.</p>
+            <p><strong>Example:</strong> Avoid pasting full articles, books, or proprietary code.</p>
+          </div>
+          <div class="card">
+            <h3>Labor & Environment</h3>
+            <p><strong>Rule:</strong> Use prompts efficiently to reduce resource use.</p>
+            <p><strong>Example:</strong> Combine related questions into one well-structured prompt.</p>
+          </div>
+          <div class="card">
+            <h3>Bias</h3>
+            <p><strong>Rule:</strong> Assume outputs reflect training biases and verify.</p>
+            <p><strong>Example:</strong> If a claim feels one-sided, check other perspectives.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-block loop">
+        <h2>2.0 THE AI CYCLE LOOP</h2>
+        <div class="loop-grid">
+          <div class="loop-card">
+            <div class="number">Card 01 - PREPARE</div>
+            <div class="tag">[Clarity]</div>
+            <p><strong>Goal:</strong> Decision, learning, or production.</p>
+            <p><strong>Self-check:</strong> Am I replacing learning I should do myself?</p>
+          </div>
+          <div class="loop-card">
+            <div class="number">Card 02 - PROMPT</div>
+            <div class="tag">[Direct]</div>
+            <p><strong>Formula:</strong> Persona + Context + Constraints.</p>
+            <p><strong>Example:</strong> "Act as a writing coach. Help me outline an essay about AI ethics for a college audience. Keep it under 500 words."</p>
+          </div>
+          <div class="loop-card">
+            <div class="number">Card 03 - VERIFY</div>
+            <div class="tag">[Check]</div>
+            <p><strong>Test claims, don't trust tone.</strong></p>
+            <p>Cross-check key facts with primary sources.</p>
+          </div>
+          <div class="loop-card">
+            <div class="number">Card 04 - REFLECT</div>
+            <div class="tag">[Reflection]</div>
+            <p><strong>Risks:</strong> Bias, hallucination, over-reliance.</p>
+            <p><strong>Skill practiced:</strong> Critical evaluation, research.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-block protocols">
+        <h2>3.0 ADVANCED PROTOCOLS</h2>
+        <div class="protocols-grid">
+          <div class="protocol-card purple">
+            <h3>Protocol 1: Visible Checkpoints</h3>
+            <p>Boosts accuracy by making reasoning explicit. Request:</p>
+            <p>
+              - List your assumptions.<br />
+              - Show any quick calculations.<br />
+              - Identify 3 failure modes.<br />
+              - State confidence level and what evidence would change your answer.
+            </p>
+          </div>
+          <div class="protocol-card cyan">
+            <h3>Protocol 2: Adversarial Playoff</h3>
+            <p>Use for structured debate:</p>
+            <p>
+              Persona 1 (Optimist): Argue for the proposal.<br />
+              Persona 2 (Skeptic): Argue against it.<br />
+              Persona 3 (Judge): Debate, then summarize valid points.<br /><br />
+              <strong>Required output:</strong> Decision, strongest pro, strongest con, and what evidence would settle it.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-block assessment-rules">
+        <h2>:: AI USE CATEGORIES (NON-NEGOTIABLE) ::</h2>
+        <ul>
+          <li><span class="cat-1">[CAT 1]</span> No AI allowed.</li>
+          <p>Examples: Exams and graded work, impersonation, confidential records.</p>
+          <li><span class="cat-2">[CAT 2]</span> Allowed with acknowledgment.</li>
+          <p>Examples: Research summaries with citations, brainstorming, drafting, outlines.</p>
+          <li><span class="cat-3">[CAT 3]</span> Required—verify critically.</li>
+          <p>Examples: Translation/accessibility tools, transcription, first-pass summaries.</p>
+        </ul>
+      </section>
+
+      <section class="section-block prompt-framework">
+        <h2>PROMPT HEURISTIC PROTOCOL</h2>
+        <p>Mandatory verification layer for all AI outputs.</p>
+        <div class="glossary-note">
+          PROMST = Presentation, Relevance, Objectivity, Method, Sources, Timeliness.
+        </div>
+        <div class="table-wrapper">
+          <table class="protocol-table">
+            <thead>
+              <tr>
+                <th>Ref</th>
+                <th>Criterion</th>
+                <th>Questions to Ask</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>P</td>
+                <td>Presentation</td>
+                <td>Is the content strong, or just polished prose?</td>
+              </tr>
+              <tr>
+                <td>R</td>
+                <td>Relevance</td>
+                <td>Does this match my actual question and scope?</td>
+              </tr>
+              <tr>
+                <td>O</td>
+                <td>Objectivity</td>
+                <td>Are multiple perspectives represented, including marginalized voices?</td>
+              </tr>
+              <tr>
+                <td>M</td>
+                <td>Method</td>
+                <td>Is the reasoning process transparent and checkable?</td>
+              </tr>
+              <tr>
+                <td>S</td>
+                <td>Sources</td>
+                <td>Can I verify claims with primary sources, or are citations fabricated?</td>
+              </tr>
+              <tr>
+                <td>T</td>
+                <td>Timeliness</td>
+                <td>Is this information current for my context?</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section-block reflection">
+        <h3>REFLECTION: The Final Gate</h3>
+        <p><strong>Mandatory question:</strong> What decision or skill am I working on?</p>
+        <p><strong>Optional checks:</strong></p>
+        <ol>
+          <li>What do I lose by outsourcing this?</li>
+          <li>What would falsify the AI's claim?</li>
+          <li>What's the smallest next action without AI?</li>
+        </ol>
+        <div class="bottom-line">AI is a Mirror, Not a Sage.</div>
+      </section>
+    </main>
+
+    <footer>
+      Vibe Coded with help from OpenCode<br />
+      AI can be wrong. Verify with primary sources.
+    </footer>
+  </body>
+</html>

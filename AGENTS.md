@@ -4,10 +4,11 @@ This repository is a small static site (HTML/CSS/vanilla JS) with a cyberpunk/ha
 
 ## Project Layout
 
-- `index.html`: Main guide page with AI‑empowerment content and verification framework.
-- `forge.html`: Prompt Forge interactive tool for building structured prompts.
-- `assets/css/styles.css`: Shared styles with CSS custom properties (design tokens).
-- `assets/js/forge.js`: Prompt Forge behavior (real‑time preview, clipboard, persistence).
+- `index.html`: Main page — Prompt Forge tool with collapsible reference drawer (native `<details name>` accordion).
+- `guide.html`: Full standalone reference manual page (linked from the drawer footer).
+- `forge.html`: Legacy redirect to `index.html` (meta-refresh for old bookmarks).
+- `assets/css/styles.css`: Shared styles (used by `guide.html`).
+- `assets/js/forge.js`: Legacy forge JS (kept for reference; new `index.html` uses inline JS).
 - `assets/favicon.svg`: Cyberpunk favicon.
 - `README.md`: Project documentation (architecture, design system, usage).
 - `AGENTS.md`: This file.
@@ -25,8 +26,8 @@ python -m http.server 8000
 ```
 
 Then open:
-- `http://localhost:8000/index.html`
-- `http://localhost:8000/forge.html`
+- `http://localhost:8000/index.html` (Prompt Forge + reference drawer)
+- `http://localhost:8000/guide.html` (full standalone reference manual)
 
 ### Single Test Guidance
 
