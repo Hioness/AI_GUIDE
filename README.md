@@ -141,6 +141,12 @@ Examples/Constraints: ${examples}`;
 6. Click "→ VIEW FULL GUIDE" in the drawer footer for the standalone page
 7. Press Escape or click the backdrop to close the drawer
 
+## Live Site
+
+The site is deployed at:
+
+- **https://ai-guide-six.vercel.app/**
+
 ## Local Preview
 
 No build system is required. Serve the directory with a static server:
