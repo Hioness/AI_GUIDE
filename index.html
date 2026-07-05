@@ -93,6 +93,40 @@
         box-shadow: 0 0 22px rgba(34, 197, 94, 0.35);
       }
 
+      .form-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.25rem;
+      }
+      .form-card-header h2 {
+        margin: 0;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: var(--tracking-wide);
+        color: var(--primary);
+      }
+
+      button.example-button {
+        background: transparent;
+        color: var(--foreground);
+        border: 1px solid var(--border);
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        font-weight: 700;
+        font-family: var(--font-mono);
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+      button.example-button:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        box-shadow: 0 0 12px rgba(34, 197, 94, 0.3);
+      }
+
       .form-group { margin-bottom: 1.5rem; }
 
       label {
@@ -109,6 +143,7 @@
         border: 1px solid var(--border);
         padding: 0.75rem;
         resize: vertical;
+        min-height: 3rem;
         font-family: var(--font-mono);
         font-size: 0.95rem;
         outline: none;
@@ -175,11 +210,55 @@
         transition: all 0.15s ease;
       }
       button:hover { box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); }
-      button.reset-button { background: transparent; color: var(--foreground); }
-      button.reset-button:hover { border-color: #ff4d6d; color: #ff4d6d; box-shadow: 0 0 12px rgba(255, 77, 109, 0.3); }
+      .clear-button { background: transparent; color: var(--foreground); }
+      .clear-button:hover { border-color: #ff4d6d; color: #ff4d6d; box-shadow: 0 0 12px rgba(255, 77, 109, 0.3); }
 
-      .reset-confirm { display: none; align-items: center; gap: 0.5rem; }
-      .confirm-yes { color: #ff4d6d; border-color: #ff4d6d; background: transparent; padding: 0.4rem 0.7rem; font-size: 0.8rem; }
+      /* ── Expand-to-confirm pattern ──────────────────── */
+      .clear-group, .example-group {
+        display: inline-flex;
+        align-items: center;
+      }
+      .clear-cancel, .example-cancel {
+        max-width: 0;
+        padding: 0;
+        border: 0;
+        overflow: hidden;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.05s ease;
+        white-space: nowrap;
+        margin-left: 0;
+        background: transparent;
+        color: var(--foreground);
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .clear-cancel:hover, .example-cancel:hover {
+        color: var(--foreground);
+        border-color: var(--foreground);
+      }
+      .clear-group.expanded .clear-cancel,
+      .example-group.expanded .example-cancel {
+        max-width: 80px;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid var(--border);
+        opacity: 1;
+        pointer-events: auto;
+        margin-left: 0.4rem;
+      }
+      .clear-group.expanded .clear-button,
+      .example-group.expanded .example-button {
+        border-color: #ff4d6d;
+        color: #ff4d6d;
+      }
+      .clear-group.expanded .clear-button:hover,
+      .example-group.expanded .example-button:hover {
+        background: rgba(255, 77, 109, 0.15);
+        box-shadow: 0 0 12px rgba(255, 77, 109, 0.3);
+      }
 
       footer {
         text-align: center;
@@ -467,6 +546,13 @@
     <main class="forge-main">
       <div class="forge-grid">
         <div class="form-card">
+          <div class="form-card-header">
+            <h2>Prompt Inputs</h2>
+            <span class="example-group" id="exampleGroup">
+              <button class="example-button" id="exampleButton" type="button" title="Load example template">LOAD EXAMPLE</button>
+              <button class="example-cancel" id="exampleCancel" type="button">Cancel</button>
+            </span>
+          </div>
           <div class="form-group">
             <label for="persona">PERSONA</label>
             <textarea id="persona" rows="2">an Experienced Prompt Engineer</textarea>
@@ -500,13 +586,11 @@
           </div>
           <div class="preview-body" id="previewContent"></div>
           <div class="copy-bar">
-            <button class="copy-button" id="copyButton">COPY PROMPT</button>
-            <button class="reset-button" id="resetButton">RESET</button>
-            <div class="reset-confirm" id="resetConfirm">
-              <span>Clear all?</span>
-              <button class="confirm-yes" id="confirmYes">Yes</button>
-              <button class="confirm-cancel" id="confirmCancel">Cancel</button>
-            </div>
+            <button class="copy-button" id="copyButton" type="button">COPY PROMPT</button>
+            <span class="clear-group" id="clearGroup">
+              <button class="clear-button" id="clearButton" type="button">CLEAR</button>
+              <button class="clear-cancel" id="clearCancel" type="button">Cancel</button>
+            </span>
           </div>
         </div>
       </div>
@@ -527,10 +611,12 @@
         const examplesInput = document.getElementById('examples');
         const previewContent = document.getElementById('previewContent');
         const copyButton = document.getElementById('copyButton');
-        const resetButton = document.getElementById('resetButton');
-        const resetConfirm = document.getElementById('resetConfirm');
-        const confirmYes = document.getElementById('confirmYes');
-        const confirmCancel = document.getElementById('confirmCancel');
+        const clearButton = document.getElementById('clearButton');
+        const clearGroup = document.getElementById('clearGroup');
+        const clearCancel = document.getElementById('clearCancel');
+        const exampleButton = document.getElementById('exampleButton');
+        const exampleGroup = document.getElementById('exampleGroup');
+        const exampleCancel = document.getElementById('exampleCancel');
 
         const storageKeys = {
           persona: 'forge-persona',
@@ -605,7 +691,18 @@
           setTimeout(() => { copyButton.textContent = originalText; }, 2000);
         };
 
-        const resetAllInputs = () => {
+        const clearAllInputs = () => {
+          personaInput.value = '';
+          contextInput.value = '';
+          taskInput.value = '';
+          formatInput.value = '';
+          examplesInput.value = '';
+          [personaInput, contextInput, taskInput, formatInput, examplesInput].forEach(el => resizeTextarea(el));
+          saveToStorage();
+          updatePreview();
+        };
+
+        const loadExample = () => {
           personaInput.value = defaultValues.persona;
           contextInput.value = defaultValues.context;
           taskInput.value = defaultValues.task;
@@ -614,8 +711,6 @@
           [personaInput, contextInput, taskInput, formatInput, examplesInput].forEach(el => resizeTextarea(el));
           saveToStorage();
           updatePreview();
-          resetConfirm.style.display = 'none';
-          resetButton.style.display = 'block';
         };
 
         const inputs = [personaInput, contextInput, taskInput, formatInput, examplesInput];
@@ -630,14 +725,53 @@
         });
 
         copyButton.addEventListener('click', copyPrompt);
-        resetButton.addEventListener('click', () => {
-          resetButton.style.display = 'none';
-          resetConfirm.style.display = 'flex';
+
+        /* CLEAR — expand-to-confirm */
+        clearButton.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (!clearGroup.classList.contains('expanded')) {
+            clearGroup.classList.add('expanded');
+            clearButton.textContent = 'Confirm?';
+          } else {
+            clearGroup.classList.remove('expanded');
+            clearButton.textContent = 'CLEAR';
+            clearAllInputs();
+          }
         });
-        confirmYes.addEventListener('click', resetAllInputs);
-        confirmCancel.addEventListener('click', () => {
-          resetConfirm.style.display = 'none';
-          resetButton.style.display = 'block';
+        clearCancel.addEventListener('click', (e) => {
+          e.stopPropagation();
+          clearGroup.classList.remove('expanded');
+          clearButton.textContent = 'CLEAR';
+        });
+
+        /* LOAD EXAMPLE — expand-to-confirm */
+        exampleButton.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (!exampleGroup.classList.contains('expanded')) {
+            exampleGroup.classList.add('expanded');
+            exampleButton.textContent = 'Confirm?';
+          } else {
+            exampleGroup.classList.remove('expanded');
+            exampleButton.textContent = 'LOAD EXAMPLE';
+            loadExample();
+          }
+        });
+        exampleCancel.addEventListener('click', (e) => {
+          e.stopPropagation();
+          exampleGroup.classList.remove('expanded');
+          exampleButton.textContent = 'LOAD EXAMPLE';
+        });
+
+        /* Click outside dismissed either expanded group */
+        document.addEventListener('click', (e) => {
+          if (clearGroup.classList.contains('expanded') && !clearGroup.contains(e.target)) {
+            clearGroup.classList.remove('expanded');
+            clearButton.textContent = 'CLEAR';
+          }
+          if (exampleGroup.classList.contains('expanded') && !exampleGroup.contains(e.target)) {
+            exampleGroup.classList.remove('expanded');
+            exampleButton.textContent = 'LOAD EXAMPLE';
+          }
         });
 
         updatePreview();

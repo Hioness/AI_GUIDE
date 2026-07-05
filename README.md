@@ -38,7 +38,8 @@ index.html (forge + drawer)  ←→  guide.html (full reference)
 ### Main Page (index.html)
 - Self-contained single file (inline CSS and JS)
 - Left column: 5 textarea inputs (Persona, Context, Task, Format, Constraints)
-- Right column: live preview in terminal-style window with copy/reset
+- Right column: live preview in terminal-style window with copy/clear
+- Left column header: LOAD EXAMPLE button restores the demo template
 - Drawer with native HTML accordion (`<details name="guide-accordion">`)
 - "?" button in the bottom-right corner opens the reference drawer
 - Escape key or backdrop click closes the drawer
@@ -113,7 +114,8 @@ Examples/Constraints: ${examples}`;
 - Exclusive accordion (native `<details name>` — zero JS)
 - drawer open/close with backdrop and Escape key
 - localStorage persistence for prompt fields
-- Reset with inline confirmation
+- Clear all fields with inline confirmation
+- Load example template from the input card header
 
 ## Accessibility
 
@@ -136,10 +138,11 @@ Examples/Constraints: ${examples}`;
 1. Open `index.html` in a web browser to see the Prompt Forge
 2. Fill in textarea inputs to generate a structured prompt
 3. Click "COPY PROMPT" to copy to clipboard
-4. Click "RESET" to clear fields (confirmation required)
-5. Click the "?" button (bottom-right) to open the reference drawer
-6. Click "→ VIEW FULL GUIDE" in the drawer footer for the standalone page
-7. Press Escape or click the backdrop to close the drawer
+4. Click "CLEAR" to empty all fields (confirmation required)
+5. Click "LOAD EXAMPLE" in the input card header to restore the demo template
+6. Click the "?" button (bottom-right) to open the reference drawer
+7. Click "→ VIEW FULL GUIDE" in the drawer footer for the standalone page
+8. Press Escape or click the backdrop to close the drawer
 
 ## Live Site
 
